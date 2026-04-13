@@ -7,6 +7,7 @@ namespace Firecrawl\Client;
 use Firecrawl\Exceptions\AuthenticationException;
 use Firecrawl\Exceptions\FirecrawlException;
 use Firecrawl\Exceptions\RateLimitException;
+use Firecrawl\Version;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ConnectException;
@@ -81,6 +82,7 @@ final class FirecrawlHttpClient
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
+            'User-Agent' => 'firecrawl-php/' . Version::SDK_VERSION,
         ], $extraHeaders);
 
         $options = [
