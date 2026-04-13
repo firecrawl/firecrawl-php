@@ -19,8 +19,11 @@ final class BrowserListResponse
     public static function fromArray(array $data): self
     {
         $sessions = [];
-        foreach (($data['sessions'] ?? []) as $session) {
-            $sessions[] = BrowserSession::fromArray($session);
+        $rawSessions = $data['sessions'] ?? [];
+        if (is_array($rawSessions)) {
+            foreach ($rawSessions as $session) {
+                $sessions[] = BrowserSession::fromArray($session);
+            }
         }
 
         return new self(

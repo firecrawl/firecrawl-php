@@ -20,10 +20,14 @@ final class SearchData
     /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
+        $web = $data['web'] ?? [];
+        $news = $data['news'] ?? [];
+        $images = $data['images'] ?? [];
+
         return new self(
-            web: $data['web'] ?? [],
-            news: $data['news'] ?? [],
-            images: $data['images'] ?? [],
+            web: is_array($web) ? $web : [],
+            news: is_array($news) ? $news : [],
+            images: is_array($images) ? $images : [],
         );
     }
 
