@@ -67,6 +67,11 @@ final class FirecrawlHttpClient
         return $this->request('DELETE', $this->baseUrl . $path);
     }
 
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
+    }
+
     /**
      * @param array<string, mixed>  $body
      * @param array<string, string> $extraHeaders
@@ -103,6 +108,9 @@ final class FirecrawlHttpClient
                 $responseBody = (string) $response->getBody();
 
                 if ($statusCode >= 200 && $statusCode < 300) {
+                    if ($responseBody === '' || $responseBody === '{}') {
+                        return [];
+                    }
                     /** @var array<string, mixed> */
                     return json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
                 }

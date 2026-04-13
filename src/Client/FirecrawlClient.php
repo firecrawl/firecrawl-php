@@ -58,7 +58,7 @@ final class FirecrawlClient
         float $backoffFactor = self::DEFAULT_BACKOFF_FACTOR,
         ?ClientInterface $httpClient = null,
     ): self {
-        $resolvedKey = $apiKey ?: (getenv('FIRECRAWL_API_KEY') ?: '');
+        $resolvedKey = trim($apiKey ?: (getenv('FIRECRAWL_API_KEY') ?: ''));
         if ($resolvedKey === '') {
             throw new FirecrawlException(
                 'API key is required. Pass it directly or set the FIRECRAWL_API_KEY environment variable.',
@@ -66,6 +66,12 @@ final class FirecrawlClient
         }
 
         $resolvedUrl = $apiUrl ?: (getenv('FIRECRAWL_API_URL') ?: self::DEFAULT_API_URL);
+
+        if (!preg_match('#^https?://#i', $resolvedUrl)) {
+            throw new FirecrawlException(
+                'API URL must be a fully qualified URL including scheme (e.g. https://api.firecrawl.dev).',
+            );
+        }
 
         $http = new FirecrawlHttpClient(
             $resolvedKey,
@@ -339,6 +345,8 @@ final class FirecrawlClient
             throw new FirecrawlException('Agent start did not return a job ID');
         }
 
+        $this->ensureValidPollInterval($pollIntervalSec);
+
         $deadline = time() + $timeoutSec;
         while (time() < $deadline) {
             $status = $this->getAgentStatus($start->getId());
@@ -456,6 +464,13 @@ final class FirecrawlClient
     // INTERNAL POLLING HELPERS
     // ================================================================
 
+    private function ensureValidPollInterval(int $pollIntervalSec): void
+    {
+        if ($pollIntervalSec < 1) {
+            throw new FirecrawlException('Poll interval must be at least 1 second, got ' . $pollIntervalSec);
+        }
+    }
+
     private function pollCrawl(
         ?string $jobId,
         int $pollIntervalSec,
@@ -464,6 +479,8 @@ final class FirecrawlClient
         if ($jobId === null) {
             throw new FirecrawlException('Crawl start did not return a job ID');
         }
+
+        $this->ensureValidPollInterval($pollIntervalSec);
 
         $deadline = time() + $timeoutSec;
         while (time() < $deadline) {
@@ -486,6 +503,8 @@ final class FirecrawlClient
             throw new FirecrawlException('Batch scrape start did not return a job ID');
         }
 
+        $this->ensureValidPollInterval($pollIntervalSec);
+
         $deadline = time() + $timeoutSec;
         while (time() < $deadline) {
             $job = $this->getBatchScrapeStatus($jobId);
@@ -498,10 +517,23 @@ final class FirecrawlClient
         throw new JobTimeoutException($jobId, $timeoutSec, 'Batch scrape');
     }
 
+    private function assertSameOrigin(string $url): void
+    {
+        $baseHost = parse_url($this->http->getBaseUrl(), PHP_URL_HOST);
+        $nextHost = parse_url($url, PHP_URL_HOST);
+
+        if ($baseHost === null || $nextHost === null || strcasecmp($baseHost, $nextHost) !== 0) {
+            throw new FirecrawlException(
+                'Pagination URL origin does not match the API base URL. Refusing to follow: ' . $url,
+            );
+        }
+    }
+
     private function paginateCrawl(CrawlJob $job): CrawlJob
     {
         $current = $job;
         while ($current->getNext() !== null && $current->getNext() !== '') {
+            $this->assertSameOrigin($current->getNext());
             $nextRaw = $this->http->getAbsolute($current->getNext());
             $nextPage = CrawlJob::fromArray($nextRaw);
 
@@ -519,6 +551,7 @@ final class FirecrawlClient
     {
         $current = $job;
         while ($current->getNext() !== null && $current->getNext() !== '') {
+            $this->assertSameOrigin($current->getNext());
             $nextRaw = $this->http->getAbsolute($current->getNext());
             $nextPage = BatchScrapeJob::fromArray($nextRaw);
 

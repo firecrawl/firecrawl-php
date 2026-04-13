@@ -16,11 +16,13 @@ final class CreditUsage
     /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
+        $inner = $data['data'] ?? $data;
+
         return new self(
-            remainingCredits: (int) ($data['remainingCredits'] ?? 0),
-            planCredits: isset($data['planCredits']) ? (int) $data['planCredits'] : null,
-            billingPeriodStart: $data['billingPeriodStart'] ?? null,
-            billingPeriodEnd: $data['billingPeriodEnd'] ?? null,
+            remainingCredits: (int) ($inner['remainingCredits'] ?? 0),
+            planCredits: isset($inner['planCredits']) ? (int) $inner['planCredits'] : null,
+            billingPeriodStart: $inner['billingPeriodStart'] ?? null,
+            billingPeriodEnd: $inner['billingPeriodEnd'] ?? null,
         );
     }
 

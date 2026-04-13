@@ -12,6 +12,9 @@ final class JsonFormat
         private readonly ?array $schema = null,
     ) {}
 
+    /**
+     * @param array<string, mixed>|null $schema
+     */
     public static function with(
         ?string $prompt = null,
         ?array $schema = null,

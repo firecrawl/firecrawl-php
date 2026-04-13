@@ -12,6 +12,9 @@ final class LocationConfig
         private readonly ?array $languages = null,
     ) {}
 
+    /**
+     * @param list<string>|null $languages
+     */
     public static function with(
         ?string $country = null,
         ?array $languages = null,

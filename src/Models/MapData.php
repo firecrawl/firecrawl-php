@@ -17,6 +17,9 @@ final class MapData
     public static function fromArray(array $data): self
     {
         $rawLinks = $data['links'] ?? [];
+        if (!is_array($rawLinks)) {
+            return new self(links: []);
+        }
         $normalized = [];
 
         foreach ($rawLinks as $link) {

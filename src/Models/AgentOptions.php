@@ -21,6 +21,10 @@ final class AgentOptions
         private readonly ?WebhookConfig $webhook = null,
     ) {}
 
+    /**
+     * @param list<string>|null         $urls
+     * @param array<string, mixed>|null $schema
+     */
     public static function with(
         ?array $urls = null,
         ?string $prompt = null,

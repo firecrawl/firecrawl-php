@@ -22,6 +22,10 @@ final class SearchOptions
         private readonly ?string $integration = null,
     ) {}
 
+    /**
+     * @param list<mixed>|null $sources
+     * @param list<mixed>|null $categories
+     */
     public static function with(
         ?array $sources = null,
         ?array $categories = null,

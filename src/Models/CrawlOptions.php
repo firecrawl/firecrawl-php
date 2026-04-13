@@ -31,6 +31,10 @@ final class CrawlOptions
         private readonly ?string $integration = null,
     ) {}
 
+    /**
+     * @param list<string>|null $excludePaths
+     * @param list<string>|null $includePaths
+     */
     public static function with(
         ?string $prompt = null,
         ?array $excludePaths = null,

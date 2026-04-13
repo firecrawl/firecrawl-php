@@ -38,7 +38,7 @@ final class CrawlJob
             status: $raw['status'] ?? null,
             total: (int) ($raw['total'] ?? 0),
             completed: (int) ($raw['completed'] ?? 0),
-            creditsUsed: $raw['creditsUsed'] ?? null,
+            creditsUsed: isset($raw['creditsUsed']) ? (int) $raw['creditsUsed'] : null,
             expiresAt: $raw['expiresAt'] ?? null,
             next: $raw['next'] ?? null,
             data: $docs,

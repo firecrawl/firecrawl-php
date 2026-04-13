@@ -35,6 +35,14 @@ final class ScrapeOptions
         private readonly ?string $integration = null,
     ) {}
 
+    /**
+     * @param list<string|JsonFormat>|null      $formats
+     * @param array<string, string>|null        $headers
+     * @param list<string>|null                 $includeTags
+     * @param list<string>|null                 $excludeTags
+     * @param list<mixed>|null                  $parsers
+     * @param list<array<string, mixed>>|null   $actions
+     */
     public static function with(
         ?array $formats = null,
         ?array $headers = null,

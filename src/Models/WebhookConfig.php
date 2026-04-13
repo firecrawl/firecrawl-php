@@ -16,6 +16,11 @@ final class WebhookConfig
         private readonly ?array $events = null,
     ) {}
 
+    /**
+     * @param array<string, string>|null $headers
+     * @param array<string, string>|null $metadata
+     * @param list<string>|null          $events
+     */
     public static function with(
         string $url,
         ?array $headers = null,
