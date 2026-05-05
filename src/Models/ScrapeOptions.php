@@ -7,7 +7,7 @@ namespace Firecrawl\Models;
 final class ScrapeOptions
 {
     /**
-     * @param list<string|JsonFormat|ScreenshotFormat>|null $formats
+     * @param list<string|JsonFormat|ScreenshotFormat|QueryFormat>|null $formats
      * @param array<string, string>|null   $headers
      * @param list<string>|null            $includeTags
      * @param list<string>|null            $excludeTags
@@ -41,7 +41,7 @@ final class ScrapeOptions
     ) {}
 
     /**
-     * @param list<string|JsonFormat|ScreenshotFormat>|null $formats
+     * @param list<string|JsonFormat|ScreenshotFormat|QueryFormat>|null $formats
      * @param array<string, string>|null                    $headers
      * @param list<string>|null                             $includeTags
      * @param list<string>|null                             $excludeTags
@@ -89,8 +89,8 @@ final class ScrapeOptions
 
         if ($this->formats !== null) {
             $data['formats'] = array_map(
-                fn (string|JsonFormat|ScreenshotFormat $f): string|array =>
-                    $f instanceof JsonFormat || $f instanceof ScreenshotFormat ? $f->toArray() : $f,
+                fn (string|JsonFormat|ScreenshotFormat|QueryFormat $f): string|array =>
+                    $f instanceof JsonFormat || $f instanceof ScreenshotFormat || $f instanceof QueryFormat ? $f->toArray() : $f,
                 $this->formats,
             );
         }
@@ -128,7 +128,7 @@ final class ScrapeOptions
         return $data;
     }
 
-    /** @return list<string|JsonFormat|ScreenshotFormat>|null */
+    /** @return list<string|JsonFormat|ScreenshotFormat|QueryFormat>|null */
     public function getFormats(): ?array
     {
         return $this->formats;
