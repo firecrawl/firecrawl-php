@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Firecrawl\Laravel\Tools;
 
+use Firecrawl\Exceptions\JobTimeoutException;
 use Firecrawl\Models\CrawlOptions;
 use Firecrawl\Models\Document;
 use Firecrawl\Models\ScrapeOptions;
@@ -12,6 +13,13 @@ use Laravel\Ai\Tools\Request;
 
 class FirecrawlCrawl extends FirecrawlTool
 {
+    /**
+     * Extenders can override this to wait longer, but the default keeps the
+     * crawl inside typical queue worker timeouts (e.g. Laravel's default of
+     * 60 seconds) so a billed crawl is not orphaned when the job is killed.
+     */
+    protected int $timeoutSeconds = 55;
+
     public function name(): string
     {
         return 'firecrawl_crawl';
@@ -21,8 +29,8 @@ class FirecrawlCrawl extends FirecrawlTool
     {
         return 'Crawl a website with Firecrawl starting from a URL, following its links and returning '
             . 'each crawled page as a {url, markdown} object in a JSON array. This is a slower, '
-            . 'multi-page operation that waits for the crawl to finish. Prefer firecrawl_scrape when '
-            . 'you only need one known page, and keep the page limit small.';
+            . 'multi-page operation. Prefer firecrawl_scrape when you only need one known page, and '
+            . 'keep the page limit small. Waits up to about a minute for the crawl to finish.';
     }
 
     public function handle(Request $request): string
@@ -30,14 +38,21 @@ class FirecrawlCrawl extends FirecrawlTool
         return $this->guard(function () use ($request): string {
             $limit = min(max($request->integer('limit') ?: 5, 1), 25);
 
-            $job = $this->client()->crawl(
-                (string) $request->string('url'),
-                CrawlOptions::with(
-                    limit: $limit,
-                    scrapeOptions: ScrapeOptions::with(formats: ['markdown']),
-                    integration: self::INTEGRATION,
-                ),
-            );
+            try {
+                $job = $this->client()->crawl(
+                    (string) $request->string('url'),
+                    CrawlOptions::with(
+                        limit: $limit,
+                        scrapeOptions: ScrapeOptions::with(formats: ['markdown']),
+                        integration: self::INTEGRATION,
+                    ),
+                    timeoutSec: $this->timeoutSeconds,
+                );
+            } catch (JobTimeoutException) {
+                return "The crawl did not finish within {$this->timeoutSeconds} seconds. It may still "
+                    . 'complete on the server. Use a smaller limit, or scrape key pages individually '
+                    . 'with firecrawl_scrape.';
+            }
 
             $pages = array_map(fn (Document $document): array => [
                 'url' => $document->getMetadata()['sourceURL']

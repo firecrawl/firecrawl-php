@@ -461,6 +461,12 @@ new FirecrawlScrape(FirecrawlClient::create(apiKey: 'fc-other-key'));
 Tool failures (rate limits, timeouts, invalid URLs) are returned to the model
 as readable error strings rather than thrown, so agent runs degrade gracefully.
 
+`firecrawl_crawl` waits up to 55 seconds for the crawl to finish. If your
+agent runs inside a queued job, keep the crawl limit small or raise the
+worker's job timeout, since a killed job orphans a crawl that is still
+running (and billed) on the server. Extend `FirecrawlCrawl` and override
+`$timeoutSeconds` to change how long it waits.
+
 ## License
 
 MIT

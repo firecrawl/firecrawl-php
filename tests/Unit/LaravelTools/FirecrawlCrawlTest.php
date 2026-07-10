@@ -66,6 +66,31 @@ it('reports crawls that finish without pages', function (): void {
     expect($result)->toBe('Crawl finished with status [failed] but returned no pages.');
 });
 
+it('reports a friendly message when the crawl exceeds its own timeout', function (): void {
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode(['success' => true, 'id' => 'job-1'])),
+        new Response(200, [], json_encode([
+            'success' => true, 'status' => 'scraping', 'total' => 0, 'completed' => 0, 'data' => [],
+        ])),
+        new Response(200, [], json_encode([
+            'success' => true, 'status' => 'scraping', 'total' => 0, 'completed' => 0, 'data' => [],
+        ])),
+    ]);
+
+    // Anonymous subclass overrides the wait so the test does not sleep for
+    // the full production timeout.
+    $tool = new class ($client) extends FirecrawlCrawl {
+        protected int $timeoutSeconds = 1;
+    };
+
+    $result = $tool->handle(new Request(['url' => 'https://example.com']));
+
+    expect($result)->toBe(
+        'The crawl did not finish within 1 seconds. It may still complete on the server. '
+        . 'Use a smaller limit, or scrape key pages individually with firecrawl_scrape.',
+    );
+});
+
 it('returns API failures as readable strings instead of throwing', function (): void {
     $client = fakeFirecrawlClient([
         new Response(400, [], json_encode(['error' => 'Invalid URL'])),
