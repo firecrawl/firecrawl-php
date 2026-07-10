@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   array; API key and config are reused from the existing Laravel integration.
   Requires `laravel/ai ^0.9` (PHP 8.3+, Laravel 12+) in the consuming app.
 
+### Fixed
+- `scrape()`, `search()`, and `map()` now throw `FirecrawlException` when the API
+  returns an HTTP 200 response with `success: false` (for example DNS resolution
+  failures), instead of silently hydrating an empty result.
+
 ## [1.3.0] - 2026-05-12
 
 ### Added

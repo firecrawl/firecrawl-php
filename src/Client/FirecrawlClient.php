@@ -730,6 +730,10 @@ final class FirecrawlClient
     }
 
     /**
+     * The API reports some failures (for example DNS resolution errors) as
+     * HTTP 200 with a `success: false` body, verified against production, so
+     * status-code handling alone is not enough to detect them.
+     *
      * @param array<string, mixed> $response
      * @return array<string, mixed> the same response, if it does not signal failure
      */
