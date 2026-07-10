@@ -29,7 +29,7 @@ it('scrapes a URL and returns markdown', function (): void {
     $body = json_decode((string) $history[0]['request']->getBody(), true);
     expect($body['url'])->toBe('https://example.com');
     expect($body['formats'])->toBe(['markdown']);
-    expect($body['integration'])->toBe('laravel-ai');
+    expect($body['integration'])->toBe('_laravel-ai');
 });
 
 it('prepends scrape warnings to the content', function (): void {

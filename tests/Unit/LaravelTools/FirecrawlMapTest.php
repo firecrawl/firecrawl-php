@@ -32,7 +32,7 @@ it('maps a site and returns discovered URLs as JSON', function (): void {
     $body = json_decode((string) $history[0]['request']->getBody(), true);
     expect($body['url'])->toBe('https://example.com');
     expect($body['limit'])->toBe(100);
-    expect($body['integration'])->toBe('laravel-ai');
+    expect($body['integration'])->toBe('_laravel-ai');
     expect($body)->not->toHaveKey('search');
 });
 

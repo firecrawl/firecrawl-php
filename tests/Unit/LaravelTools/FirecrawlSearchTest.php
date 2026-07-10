@@ -30,7 +30,7 @@ it('searches the web and returns JSON results', function (): void {
     $body = json_decode((string) $history[0]['request']->getBody(), true);
     expect($body['query'])->toBe('firecrawl');
     expect($body['limit'])->toBe(5);
-    expect($body['integration'])->toBe('laravel-ai');
+    expect($body['integration'])->toBe('_laravel-ai');
 });
 
 it('clamps the limit between 1 and 20', function (): void {

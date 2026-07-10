@@ -12,7 +12,11 @@ use Laravel\Ai\Contracts\Tool;
 
 abstract class FirecrawlTool implements Tool
 {
-    protected const INTEGRATION = 'laravel-ai';
+    // Prefixed with an underscore because the API's integration validator
+    // accepts any value starting with `_` on every deployed version, letting
+    // these tools work against lagging or self-hosted APIs with no deploy
+    // ordering requirement.
+    protected const INTEGRATION = '_laravel-ai';
 
     public function __construct(
         private ?FirecrawlClient $client = null,

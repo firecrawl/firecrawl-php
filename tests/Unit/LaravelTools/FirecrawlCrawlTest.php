@@ -35,7 +35,7 @@ it('crawls a site and returns pages as JSON', function (): void {
     expect($body['url'])->toBe('https://example.com');
     expect($body['limit'])->toBe(5);
     expect($body['scrapeOptions']['formats'])->toBe(['markdown']);
-    expect($body['integration'])->toBe('laravel-ai');
+    expect($body['integration'])->toBe('_laravel-ai');
 });
 
 it('clamps the page limit between 1 and 25', function (): void {
