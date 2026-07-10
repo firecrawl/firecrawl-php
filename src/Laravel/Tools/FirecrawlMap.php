@@ -25,7 +25,7 @@ class FirecrawlMap extends FirecrawlTool
     public function handle(Request $request): string
     {
         return $this->guard(function () use ($request): string {
-            $limit = min(max($request->integer('limit') ?: 100, 1), 5000);
+            $limit = min(max($request->integer('limit') ?: 100, 1), 500);
             $search = (string) $request->string('search');
 
             $map = $this->client()->map(
@@ -61,7 +61,7 @@ class FirecrawlMap extends FirecrawlTool
                 ->required(),
             'search' => $schema->string()
                 ->description('Optional term to filter the discovered URLs by relevance (e.g. "docs").'),
-            'limit' => $schema->integer()->min(1)->max(5000)
+            'limit' => $schema->integer()->min(1)->max(500)
                 ->description('Maximum number of URLs to return. Defaults to 100.'),
         ];
     }

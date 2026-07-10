@@ -48,6 +48,18 @@ it('passes the search filter through when provided', function (): void {
     expect($body['search'])->toBe('docs');
 });
 
+it('clamps an explicit limit of 5000 down to 500', function (): void {
+    $history = new ArrayObject();
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode(['success' => true, 'data' => ['links' => []]])),
+    ], $history);
+
+    (new FirecrawlMap($client))->handle(new Request(['url' => 'https://example.com', 'limit' => 5000]));
+
+    $body = json_decode((string) $history[0]['request']->getBody(), true);
+    expect($body['limit'])->toBe(500);
+});
+
 it('reports when no URLs were discovered', function (): void {
     $client = fakeFirecrawlClient([
         new Response(200, [], json_encode(['success' => true, 'data' => ['links' => []]])),

@@ -76,4 +76,20 @@ abstract class FirecrawlTool implements Tool
 
         return $warning !== null ? "Warning: {$warning}\n\n{$content}" : $content;
     }
+
+    /**
+     * Trim tool output so a large page cannot overflow the model context
+     * or the consumer's conversation storage.
+     */
+    protected function truncate(string $content, int $maxCharacters): string
+    {
+        if (mb_strlen($content) <= $maxCharacters) {
+            return $content;
+        }
+
+        $total = mb_strlen($content);
+
+        return mb_substr($content, 0, $maxCharacters)
+            . "\n\n[Truncated: showing the first {$maxCharacters} of {$total} characters.]";
+    }
 }

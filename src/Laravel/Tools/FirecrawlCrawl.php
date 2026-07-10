@@ -43,7 +43,7 @@ class FirecrawlCrawl extends FirecrawlTool
                 'url' => $document->getMetadata()['sourceURL']
                     ?? $document->getMetadata()['url']
                     ?? null,
-                'markdown' => $this->documentContent($document),
+                'markdown' => $this->truncate($this->documentContent($document), 15000),
             ], $job->getData());
 
             if ($pages === []) {

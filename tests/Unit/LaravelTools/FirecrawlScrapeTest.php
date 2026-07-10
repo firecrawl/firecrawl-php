@@ -78,6 +78,21 @@ it('surfaces a success:false envelope as an error instead of empty content', fun
     expect($result)->toStartWith('Firecrawl request failed: DNS resolution failed');
 });
 
+it('truncates markdown longer than 80000 characters', function (): void {
+    $prefix = str_repeat('a', 80000);
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode([
+            'success' => true,
+            'data' => ['markdown' => $prefix . str_repeat('b', 100)],
+        ])),
+    ]);
+
+    $result = (new FirecrawlScrape($client))->handle(new Request(['url' => 'https://example.com']));
+
+    expect($result)->toStartWith($prefix);
+    expect($result)->toEndWith('[Truncated: showing the first 80000 of 80100 characters.]');
+});
+
 it('resolves the client from the container when none is injected', function (): void {
     $container = new Container();
     $container->instance(FirecrawlClient::class, fakeFirecrawlClient([

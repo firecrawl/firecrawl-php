@@ -33,7 +33,7 @@ class FirecrawlScrape extends FirecrawlTool
                 ),
             );
 
-            return $this->documentContent($document);
+            return $this->truncate($this->documentContent($document), 80000);
         });
     }
 
