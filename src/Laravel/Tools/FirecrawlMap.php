@@ -18,8 +18,8 @@ class FirecrawlMap extends FirecrawlTool
     public function description(): string
     {
         return 'Map a website with Firecrawl to discover the URLs it contains, returned as a JSON '
-            . 'array of {url, title} objects. Use this to find pages on a specific site — optionally '
-            . 'filtered by a search term — before scraping or crawling them.';
+            . 'array of {url, title} objects. Use this to find pages on a specific site, optionally '
+            . 'filtered by a search term, before scraping or crawling them.';
     }
 
     public function handle(Request $request): string

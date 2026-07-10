@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel AI SDK integration: native tool classes `FirecrawlScrape`, `FirecrawlSearch`,
   `FirecrawlMap`, and `FirecrawlCrawl` in `Firecrawl\Laravel\Tools`, plus a
   `FirecrawlTools::all()` helper. Drop them into any `laravel/ai` agent's `tools()`
-  array — API key and config are reused from the existing Laravel integration.
+  array; API key and config are reused from the existing Laravel integration.
   Requires `laravel/ai ^0.9` (PHP 8.3+, Laravel 12+) in the consuming app.
 
 ## [1.3.0] - 2026-05-12

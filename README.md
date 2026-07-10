@@ -396,7 +396,7 @@ The SDK ships native tool classes for the [Laravel AI SDK](https://laravel.com/d
 composer require laravel/ai
 ```
 
-Add Firecrawl capabilities to any agent — no MCP server or manual HTTP calls needed.
+Add Firecrawl capabilities to any agent, no MCP server or manual HTTP calls needed.
 The tools resolve the `FirecrawlClient` from the container, so your existing
 `config/firecrawl.php` / `FIRECRAWL_API_KEY` setup is reused as-is:
 

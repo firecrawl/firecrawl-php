@@ -27,6 +27,5 @@ it('passes an explicit client through to every tool', function (): void {
 
     [$scrape] = FirecrawlTools::all($client);
 
-    // Uses the injected client (no container involved) — would throw otherwise.
     expect($scrape->handle(new Request(['url' => 'https://example.com'])))->toBe('# Hi');
 });

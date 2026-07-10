@@ -11,9 +11,9 @@ use Laravel\Ai\Tools\Request;
 it('crawls a site and returns pages as JSON', function (): void {
     $history = new ArrayObject();
     $client = fakeFirecrawlClient([
-        // POST /v2/crawl — start the job
+        // POST /v2/crawl: start the job
         new Response(200, [], json_encode(['success' => true, 'id' => 'job-1'])),
-        // GET /v2/crawl/job-1 — first poll, already completed
+        // GET /v2/crawl/job-1: first poll, already completed
         new Response(200, [], json_encode([
             'success' => true,
             'status' => 'completed',

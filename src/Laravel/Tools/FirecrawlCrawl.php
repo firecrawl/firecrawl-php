@@ -21,7 +21,7 @@ class FirecrawlCrawl extends FirecrawlTool
     {
         return 'Crawl a website with Firecrawl starting from a URL, following its links and returning '
             . 'each crawled page as a {url, markdown} object in a JSON array. This is a slower, '
-            . 'multi-page operation that waits for the crawl to finish — prefer firecrawl_scrape when '
+            . 'multi-page operation that waits for the crawl to finish. Prefer firecrawl_scrape when '
             . 'you only need one known page, and keep the page limit small.';
     }
 

@@ -85,7 +85,6 @@ it('converts non-SDK failures into readable strings instead of throwing', functi
     Container::setInstance(new Container());
 
     try {
-        // No FirecrawlClient binding — container resolution fails inside handle().
         $result = (new FirecrawlScrape())->handle(new Request(['url' => 'https://example.com']));
     } finally {
         Container::setInstance(null);
