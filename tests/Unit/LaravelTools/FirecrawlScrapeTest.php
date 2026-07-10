@@ -65,6 +65,19 @@ it('returns API failures as readable strings instead of throwing', function (): 
     expect($result)->toStartWith('Firecrawl request failed:');
 });
 
+it('surfaces a success:false envelope as an error instead of empty content', function (): void {
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode([
+            'success' => false,
+            'error' => 'DNS resolution failed for host: nosuchdomain.example',
+        ])),
+    ]);
+
+    $result = (new FirecrawlScrape($client))->handle(new Request(['url' => 'https://nosuchdomain.example']));
+
+    expect($result)->toStartWith('Firecrawl request failed: DNS resolution failed');
+});
+
 it('resolves the client from the container when none is injected', function (): void {
     $container = new Container();
     $container->instance(FirecrawlClient::class, fakeFirecrawlClient([

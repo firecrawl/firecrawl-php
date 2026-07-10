@@ -55,6 +55,19 @@ it('reports when no results were found', function (): void {
     expect($result)->toBe('No results found.');
 });
 
+it('surfaces a success:false envelope as an error instead of empty results', function (): void {
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode([
+            'success' => false,
+            'error' => 'DNS resolution failed for host: nosuchdomain.example',
+        ])),
+    ]);
+
+    $result = (new FirecrawlSearch($client))->handle(new Request(['query' => 'nosuchdomain.example']));
+
+    expect($result)->toStartWith('Firecrawl request failed: DNS resolution failed');
+});
+
 it('exposes name and a schema with required query and optional limit', function (): void {
     $tool = new FirecrawlSearch(fakeFirecrawlClient([]));
 

@@ -112,7 +112,7 @@ final class FirecrawlClient
         }
         $body['origin'] ??= 'php-sdk@' . Version::SDK_VERSION;
 
-        $response = $this->http->post('/v2/scrape', $body);
+        $response = $this->assertSuccess($this->http->post('/v2/scrape', $body));
 
         return Document::fromArray($response['data'] ?? $response);
     }
@@ -387,7 +387,7 @@ final class FirecrawlClient
             $body = array_merge($body, $options->toArray());
         }
 
-        $response = $this->http->post('/v2/map', $body);
+        $response = $this->assertSuccess($this->http->post('/v2/map', $body));
 
         return MapData::fromArray($response['data'] ?? $response);
     }
@@ -554,7 +554,7 @@ final class FirecrawlClient
         }
         $body['origin'] ??= 'php-sdk@' . Version::SDK_VERSION;
 
-        $response = $this->http->post('/v2/search', $body);
+        $response = $this->assertSuccess($this->http->post('/v2/search', $body));
 
         return SearchData::fromArray($response['data'] ?? $response);
     }
@@ -727,6 +727,23 @@ final class FirecrawlClient
         if ($pollIntervalSec < 1) {
             throw new FirecrawlException('Poll interval must be at least 1 second, got ' . $pollIntervalSec);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     * @return array<string, mixed> the same response, if it does not signal failure
+     */
+    private function assertSuccess(array $response): array
+    {
+        if (($response['success'] ?? null) === false) {
+            $error = $response['error'] ?? null;
+
+            throw new FirecrawlException(is_string($error) && $error !== ''
+                ? $error
+                : 'The API reported the request as unsuccessful.');
+        }
+
+        return $response;
     }
 
     /**
