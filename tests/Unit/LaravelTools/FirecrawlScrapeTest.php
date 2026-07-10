@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Firecrawl\Client\FirecrawlClient;
 use Firecrawl\Laravel\Tools\FirecrawlScrape;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Container\Container;
 use Illuminate\JsonSchema\JsonSchemaTypeFactory;
 use Laravel\Ai\ObjectSchema;
 use Laravel\Ai\Tools\Request;
@@ -61,6 +63,35 @@ it('returns API failures as readable strings instead of throwing', function (): 
     $result = (new FirecrawlScrape($client))->handle(new Request(['url' => 'https://example.com']));
 
     expect($result)->toStartWith('Firecrawl request failed:');
+});
+
+it('resolves the client from the container when none is injected', function (): void {
+    $container = new Container();
+    $container->instance(FirecrawlClient::class, fakeFirecrawlClient([
+        new Response(200, [], json_encode(['success' => true, 'data' => ['markdown' => '# Via Container']])),
+    ]));
+    Container::setInstance($container);
+
+    try {
+        $result = (new FirecrawlScrape())->handle(new Request(['url' => 'https://example.com']));
+    } finally {
+        Container::setInstance(null);
+    }
+
+    expect($result)->toBe('# Via Container');
+});
+
+it('converts non-SDK failures into readable strings instead of throwing', function (): void {
+    Container::setInstance(new Container());
+
+    try {
+        // No FirecrawlClient binding — container resolution fails inside handle().
+        $result = (new FirecrawlScrape())->handle(new Request(['url' => 'https://example.com']));
+    } finally {
+        Container::setInstance(null);
+    }
+
+    expect($result)->toStartWith('Tool execution failed:');
 });
 
 it('exposes name, description, and a required url parameter', function (): void {

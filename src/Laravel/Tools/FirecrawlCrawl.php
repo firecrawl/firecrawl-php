@@ -50,7 +50,7 @@ class FirecrawlCrawl extends FirecrawlTool
                 return "Crawl finished with status [{$job->getStatus()}] but returned no pages.";
             }
 
-            return json_encode($pages, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+            return $this->toJson($pages);
         });
     }
 

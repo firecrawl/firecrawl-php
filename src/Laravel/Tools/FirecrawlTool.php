@@ -32,6 +32,8 @@ abstract class FirecrawlTool implements Tool
     /**
      * Run a Firecrawl call, returning failures as strings so the model can
      * see the error and recover instead of aborting the whole agent run.
+     * Non-SDK failures (e.g. container resolution, JSON encoding) are also
+     * converted to strings so `handle()` never throws.
      *
      * @param callable(): string $callback
      */
@@ -41,7 +43,18 @@ abstract class FirecrawlTool implements Tool
             return $callback();
         } catch (FirecrawlException $exception) {
             return 'Firecrawl request failed: ' . $exception->getMessage();
+        } catch (\Throwable $exception) {
+            return 'Tool execution failed: ' . $exception->getMessage();
         }
+    }
+
+    /** @param array<int|string, mixed> $data */
+    protected function toJson(array $data): string
+    {
+        return json_encode(
+            $data,
+            JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR,
+        );
     }
 
     protected function documentContent(Document $document): string
