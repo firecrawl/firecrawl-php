@@ -730,9 +730,10 @@ final class FirecrawlClient
     }
 
     /**
-     * The API reports some failures (for example DNS resolution errors) as
-     * HTTP 200 with a `success: false` body, verified against production, so
-     * status-code handling alone is not enough to detect them.
+     * The API intentionally reports some failures (for example DNS resolution
+     * errors) as HTTP 200 with a `success: false` body, so for those the flag,
+     * not the status code, is the error signal. The Python and JS SDKs raise
+     * on it the same way.
      *
      * @param array<string, mixed> $response
      * @return array<string, mixed> the same response, if it does not signal failure
