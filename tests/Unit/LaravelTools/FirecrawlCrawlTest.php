@@ -77,8 +77,7 @@ it('reports a friendly message when the crawl exceeds its own timeout', function
         ])),
     ]);
 
-    // Anonymous subclass overrides the wait so the test does not sleep for
-    // the full production timeout.
+    // Override the wait so the test does not sleep for the production timeout.
     $tool = new class ($client) extends FirecrawlCrawl {
         protected int $timeoutSeconds = 1;
     };
