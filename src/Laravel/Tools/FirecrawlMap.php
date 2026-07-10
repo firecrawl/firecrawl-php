@@ -37,12 +37,12 @@ class FirecrawlMap extends FirecrawlTool
                 ),
             );
 
-            $links = array_values(array_map(static function (array $link): array {
+            $links = array_map(static function (array $link): array {
                 return array_filter(
                     ['url' => $link['url'] ?? null, 'title' => $link['title'] ?? null],
                     static fn (mixed $value): bool => $value !== null,
                 );
-            }, $map->getLinks()));
+            }, $map->getLinks());
 
             if ($links === []) {
                 return 'No URLs discovered.';

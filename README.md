@@ -387,6 +387,80 @@ class MyController
 }
 ```
 
+### Laravel AI SDK Tools
+
+The SDK ships native tool classes for the [Laravel AI SDK](https://laravel.com/docs/ai-sdk)
+(`laravel/ai`, requires PHP 8.3+ and Laravel 12+):
+
+```bash
+composer require laravel/ai
+```
+
+Add Firecrawl capabilities to any agent — no MCP server or manual HTTP calls needed.
+The tools resolve the `FirecrawlClient` from the container, so your existing
+`config/firecrawl.php` / `FIRECRAWL_API_KEY` setup is reused as-is:
+
+```php
+use Firecrawl\Laravel\Tools\FirecrawlScrape;
+use Firecrawl\Laravel\Tools\FirecrawlSearch;
+use Laravel\Ai\Contracts\Agent;
+use Laravel\Ai\Contracts\HasTools;
+use Laravel\Ai\Promptable;
+use Stringable;
+
+class ResearchAssistant implements Agent, HasTools
+{
+    use Promptable;
+
+    public function instructions(): Stringable|string
+    {
+        return 'You are a research assistant. Use the Firecrawl tools to find and read web content.';
+    }
+
+    public function tools(): iterable
+    {
+        return [
+            new FirecrawlScrape,
+            new FirecrawlSearch,
+        ];
+    }
+}
+
+$response = ResearchAssistant::make()->prompt('What does firecrawl.dev do?');
+```
+
+Available tools:
+
+| Class | Tool name | Wraps |
+|---|---|---|
+| `FirecrawlScrape` | `firecrawl_scrape` | Scrape one URL to markdown |
+| `FirecrawlSearch` | `firecrawl_search` | Web search with JSON results |
+| `FirecrawlMap` | `firecrawl_map` | Discover a site's URLs |
+| `FirecrawlCrawl` | `firecrawl_crawl` | Crawl multiple pages to markdown |
+
+Register all of them at once with the spread helper:
+
+```php
+use Firecrawl\Laravel\Tools\FirecrawlTools;
+
+public function tools(): iterable
+{
+    return [...FirecrawlTools::all()];
+}
+```
+
+Every tool also accepts an explicit client, for one-off credentials or use
+outside the container:
+
+```php
+use Firecrawl\Client\FirecrawlClient;
+
+new FirecrawlScrape(FirecrawlClient::create(apiKey: 'fc-other-key'));
+```
+
+Tool failures (rate limits, timeouts, invalid URLs) are returned to the model
+as readable error strings rather than thrown, so agent runs degrade gracefully.
+
 ## License
 
 MIT
