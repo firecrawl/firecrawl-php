@@ -16,7 +16,8 @@ class FirecrawlCrawl extends FirecrawlTool
     /**
      * Extenders can override this to wait longer, but the default keeps the
      * crawl inside typical queue worker timeouts (e.g. Laravel's default of
-     * 60 seconds) so a billed crawl is not orphaned when the job is killed.
+     * 60 seconds) so the tool returns a readable timeout message instead of
+     * dying with the job.
      */
     protected int $timeoutSeconds = 55;
 
