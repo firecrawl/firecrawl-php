@@ -14,9 +14,8 @@ use Laravel\Ai\Tools\Request;
 class FirecrawlCrawl extends FirecrawlTool
 {
     /**
-     * One wall-clock deadline covering the start request and all polling.
-     * Kept below typical queue worker timeouts (Laravel defaults to 60
-     * seconds); override to wait longer.
+     * Wall-clock limit for the start request and polling, kept below typical
+     * queue worker timeouts (Laravel defaults to 60 seconds).
      */
     protected int $timeoutSeconds = 55;
 
@@ -89,9 +88,8 @@ class FirecrawlCrawl extends FirecrawlTool
     }
 
     /**
-     * The status field keeps failed or cancelled crawls visible even when
-     * partial pages came back. Pagination cursors are reported, not
-     * followed, so the result stays one bounded response.
+     * Failed or cancelled crawls stay visible through the status field.
+     * Pagination cursors are reported, not followed.
      *
      * @return array<string, mixed>
      */

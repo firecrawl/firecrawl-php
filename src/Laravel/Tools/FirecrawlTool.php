@@ -52,8 +52,8 @@ abstract class FirecrawlTool implements Tool
     }
 
     /**
-     * Encode list items as JSON, dropping tail items when the result would
-     * exceed the output budget; a final {"omitted": N} element reports the cut.
+     * Drop tail items when the JSON would exceed the output budget; a final
+     * {"omitted": N} element reports the cut.
      *
      * @param list<array<string, mixed>> $items
      */
