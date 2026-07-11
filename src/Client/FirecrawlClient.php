@@ -262,11 +262,18 @@ final class FirecrawlClient
     public function startCrawl(string $url, ?CrawlOptions $options = null): CrawlResponse
     {
         $body = ['url' => $url];
+        $extraHeaders = [];
+
         if ($options !== null) {
+            $idempotencyKey = $options->getIdempotencyKey();
+            if ($idempotencyKey !== null && $idempotencyKey !== '') {
+                $extraHeaders['x-idempotency-key'] = $idempotencyKey;
+            }
+
             $body = array_merge($body, $options->toArray());
         }
 
-        return CrawlResponse::fromArray($this->http->post('/v2/crawl', $body));
+        return CrawlResponse::fromArray($this->http->post('/v2/crawl', $body, $extraHeaders));
     }
 
     /**

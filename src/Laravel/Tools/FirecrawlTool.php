@@ -16,6 +16,9 @@ abstract class FirecrawlTool implements Tool
     // deployed version, including older self-hosted instances.
     protected const INTEGRATION = '_laravel-ai';
 
+    /** Whole-result output ceiling; override to change. */
+    protected int $outputCharacterBudget = 100000;
+
     public function __construct(
         private ?FirecrawlClient $client = null,
     ) {}
@@ -46,6 +49,25 @@ abstract class FirecrawlTool implements Tool
         } catch (\Throwable $exception) {
             return 'Tool execution failed: ' . $exception->getMessage();
         }
+    }
+
+    /**
+     * Encode list items as JSON, dropping tail items when the result would
+     * exceed the output budget; a final {"omitted": N} element reports the cut.
+     *
+     * @param list<array<string, mixed>> $items
+     */
+    protected function toBudgetedJson(array $items): string
+    {
+        $json = $this->toJson($items);
+        $total = count($items);
+
+        while (mb_strlen($json) > $this->outputCharacterBudget && count($items) > 1) {
+            $items = array_slice($items, 0, (int) ceil(count($items) / 2));
+            $json = $this->toJson([...$items, ['omitted' => $total - count($items)]]);
+        }
+
+        return $json;
     }
 
     /** @param array<int|string, mixed> $data */

@@ -42,7 +42,7 @@ class FirecrawlSearch extends FirecrawlTool
                 return 'No results found.';
             }
 
-            return $this->toJson($web);
+            return $this->toBudgetedJson($web);
         });
     }
 

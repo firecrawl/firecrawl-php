@@ -48,7 +48,7 @@ class FirecrawlMap extends FirecrawlTool
                 return 'No URLs discovered.';
             }
 
-            return $this->toJson($links);
+            return $this->toBudgetedJson($links);
         });
     }
 

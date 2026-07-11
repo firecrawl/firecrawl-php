@@ -94,3 +94,25 @@ it('exposes name and a schema with required url', function (): void {
     $jsonSchema = (new ObjectSchema($types))->toSchema();
     expect($jsonSchema['required'])->toContain('url');
 });
+
+it('drops tail links and reports the cut when output exceeds the budget', function (): void {
+    $links = [];
+    for ($i = 1; $i <= 4; $i++) {
+        $links[] = ['url' => "https://example.com/page-{$i}"];
+    }
+
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode(['success' => true, 'data' => ['links' => $links]])),
+    ]);
+
+    $tool = new class ($client) extends FirecrawlMap {
+        protected int $outputCharacterBudget = 100;
+    };
+
+    $result = $tool->handle(new Request(['url' => 'https://example.com']));
+    $decoded = json_decode($result, true);
+
+    expect(mb_strlen($result))->toBeLessThanOrEqual(100);
+    expect($decoded)->not->toHaveCount(4);
+    expect(array_key_exists('omitted', end($decoded)))->toBeTrue();
+});
