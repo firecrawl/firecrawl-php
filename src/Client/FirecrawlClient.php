@@ -259,8 +259,11 @@ final class FirecrawlClient
     /**
      * Start an async crawl job and return immediately.
      */
-    public function startCrawl(string $url, ?CrawlOptions $options = null): CrawlResponse
-    {
+    public function startCrawl(
+        string $url,
+        ?CrawlOptions $options = null,
+        ?float $requestTimeoutSeconds = null,
+    ): CrawlResponse {
         $body = ['url' => $url];
         $extraHeaders = [];
 
@@ -273,15 +276,17 @@ final class FirecrawlClient
             $body = array_merge($body, $options->toArray());
         }
 
-        return CrawlResponse::fromArray($this->http->post('/v2/crawl', $body, $extraHeaders));
+        return CrawlResponse::fromArray(
+            $this->http->post('/v2/crawl', $body, $extraHeaders, $requestTimeoutSeconds),
+        );
     }
 
     /**
      * Get the status and results of a crawl job.
      */
-    public function getCrawlStatus(string $jobId): CrawlJob
+    public function getCrawlStatus(string $jobId, ?float $requestTimeoutSeconds = null): CrawlJob
     {
-        return CrawlJob::fromArray($this->http->get("/v2/crawl/{$jobId}"));
+        return CrawlJob::fromArray($this->http->get("/v2/crawl/{$jobId}", $requestTimeoutSeconds));
     }
 
     /**

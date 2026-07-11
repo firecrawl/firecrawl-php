@@ -396,6 +396,9 @@ The SDK ships native tool classes for the [Laravel AI SDK](https://laravel.com/d
 composer require laravel/ai
 ```
 
+Note for contributors: `laravel/ai` is also a dev dependency of this package,
+so running the SDK's own test suite requires PHP 8.3+.
+
 Add Firecrawl capabilities to any agent, no MCP server or manual HTTP calls needed.
 The tools resolve the `FirecrawlClient` from the container, so your existing
 `config/firecrawl.php` / `FIRECRAWL_API_KEY` setup is reused as-is:

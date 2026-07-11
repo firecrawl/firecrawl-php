@@ -67,6 +67,10 @@ abstract class FirecrawlTool implements Tool
             $json = $this->toJson([...$items, ['omitted' => $total - count($items)]]);
         }
 
+        if (mb_strlen($json) > $this->outputCharacterBudget) {
+            $json = $this->toJson([['omitted' => $total]]);
+        }
+
         return $json;
     }
 
@@ -97,6 +101,7 @@ abstract class FirecrawlTool implements Tool
 
     /**
      * Trim tool output so large pages do not overflow the model context.
+     * The truncation notice fits inside the cap.
      */
     protected function truncate(string $content, int $maxCharacters): string
     {
@@ -105,8 +110,12 @@ abstract class FirecrawlTool implements Tool
         }
 
         $total = mb_strlen($content);
+        $suffix = "\n\n[Truncated: {$total} characters total.]";
 
-        return mb_substr($content, 0, $maxCharacters)
-            . "\n\n[Truncated: showing the first {$maxCharacters} of {$total} characters.]";
+        if ($maxCharacters <= mb_strlen($suffix)) {
+            return mb_substr($content, 0, $maxCharacters);
+        }
+
+        return mb_substr($content, 0, $maxCharacters - mb_strlen($suffix)) . $suffix;
     }
 }

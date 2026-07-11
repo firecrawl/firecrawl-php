@@ -51,6 +51,7 @@ class FirecrawlCrawl extends FirecrawlTool
                     integration: self::INTEGRATION,
                     idempotencyKey: $this->newIdempotencyKey(),
                 ),
+                requestTimeoutSeconds: $this->remainingSeconds($deadline),
             );
 
             $jobId = $start->getId();
@@ -58,7 +59,7 @@ class FirecrawlCrawl extends FirecrawlTool
                 throw new FirecrawlException('Crawl start did not return a job ID.');
             }
 
-            $job = $this->client()->getCrawlStatus($jobId);
+            $job = $this->client()->getCrawlStatus($jobId, $this->remainingSeconds($deadline));
 
             while (!$job->isDone()) {
                 if (time() >= $deadline) {
@@ -68,11 +69,16 @@ class FirecrawlCrawl extends FirecrawlTool
                 }
 
                 sleep($this->pollIntervalSeconds);
-                $job = $this->client()->getCrawlStatus($jobId);
+                $job = $this->client()->getCrawlStatus($jobId, $this->remainingSeconds($deadline));
             }
 
             return $this->toJson($this->formatJob($job));
         });
+    }
+
+    private function remainingSeconds(int $deadline): float
+    {
+        return (float) max($deadline - time(), 1);
     }
 
     /**
@@ -100,20 +106,21 @@ class FirecrawlCrawl extends FirecrawlTool
         $omitted = 0;
 
         foreach ($job->getData() as $document) {
-            $markdown = $this->truncate($this->documentContent($document), $this->pageCharacterLimit);
+            $page = [
+                'url' => $document->getMetadata()['sourceURL']
+                    ?? $document->getMetadata()['url']
+                    ?? null,
+                'markdown' => $this->truncate($this->documentContent($document), $this->pageCharacterLimit),
+            ];
+            $length = mb_strlen($this->toJson($page));
 
-            if ($pages !== [] && $used + mb_strlen($markdown) > $this->outputCharacterBudget) {
+            if ($pages !== [] && $used + $length > $this->outputCharacterBudget) {
                 $omitted++;
                 continue;
             }
 
-            $used += mb_strlen($markdown);
-            $pages[] = [
-                'url' => $document->getMetadata()['sourceURL']
-                    ?? $document->getMetadata()['url']
-                    ?? null,
-                'markdown' => $markdown,
-            ];
+            $used += $length;
+            $pages[] = $page;
         }
 
         $result = [
@@ -128,7 +135,8 @@ class FirecrawlCrawl extends FirecrawlTool
         }
 
         if ($job->getNext() !== null && $job->getNext() !== '') {
-            $result['note'] = 'More pages exist on the server than fit in this response.';
+            $result['note'] = 'More pages exist on the server than fit in this response. '
+                . 'Use a smaller limit or scrape specific pages with firecrawl_scrape.';
         }
 
         return $result;

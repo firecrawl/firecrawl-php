@@ -116,3 +116,19 @@ it('drops tail links and reports the cut when output exceeds the budget', functi
     expect($decoded)->not->toHaveCount(4);
     expect(array_key_exists('omitted', end($decoded)))->toBeTrue();
 });
+
+it('reduces a single oversized item to an omitted marker', function (): void {
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode(['success' => true, 'data' => ['links' => [
+            ['url' => 'https://example.com/' . str_repeat('x', 400)],
+        ]]])),
+    ]);
+
+    $tool = new class ($client) extends FirecrawlMap {
+        protected int $outputCharacterBudget = 100;
+    };
+
+    $result = $tool->handle(new Request(['url' => 'https://example.com']));
+
+    expect(json_decode($result, true))->toBe([['omitted' => 1]]);
+});

@@ -173,3 +173,20 @@ it('exposes name and a schema with required url and optional limit', function ()
     expect($jsonSchema['required'])->toContain('url');
     expect($jsonSchema['required'])->not->toContain('limit');
 });
+
+it('bounds each HTTP request by the remaining deadline', function (): void {
+    $history = new ArrayObject();
+    $client = fakeFirecrawlClient([
+        new Response(200, [], json_encode(['success' => true, 'id' => 'job-1'])),
+        new Response(200, [], json_encode([
+            'success' => true, 'status' => 'completed', 'total' => 0, 'completed' => 0, 'data' => [],
+        ])),
+    ], $history);
+
+    (new FirecrawlCrawl($client))->handle(new Request(['url' => 'https://example.com']));
+
+    foreach ([0, 1] as $i) {
+        $timeout = $history[$i]['options'][GuzzleHttp\RequestOptions::TIMEOUT] ?? null;
+        expect($timeout)->toBeFloat()->toBeGreaterThan(0)->toBeLessThanOrEqual(55.0);
+    }
+});

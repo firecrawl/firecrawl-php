@@ -89,8 +89,9 @@ it('truncates markdown longer than 80000 characters', function (): void {
 
     $result = (new FirecrawlScrape($client))->handle(new Request(['url' => 'https://example.com']));
 
-    expect($result)->toStartWith($prefix);
-    expect($result)->toEndWith('[Truncated: showing the first 80000 of 80100 characters.]');
+    expect(mb_strlen($result))->toBeLessThanOrEqual(80000);
+    expect($result)->toStartWith(str_repeat('a', 1000));
+    expect($result)->toEndWith('[Truncated: 80100 characters total.]');
 });
 
 it('resolves the client from the container when none is injected', function (): void {

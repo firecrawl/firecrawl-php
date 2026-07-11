@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Requires `laravel/ai ^0.9` (PHP 8.3+, Laravel 12+) in the consuming app.
 - `CrawlOptions::with(idempotencyKey:)`: `startCrawl()` now sends the
   `x-idempotency-key` header, matching the existing batch scrape support.
+- `startCrawl()` and `getCrawlStatus()` accept an optional per-request
+  timeout in seconds.
 
 ### Fixed
 - `scrape()`, `search()`, and `map()` now throw `FirecrawlException` when the API
