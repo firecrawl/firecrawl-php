@@ -32,10 +32,8 @@ abstract class FirecrawlTool implements Tool
     }
 
     /**
-     * Run a Firecrawl call, returning failures as strings so the model can
-     * see the error and recover instead of aborting the whole agent run.
-     * Non-SDK failures (e.g. container resolution, JSON encoding) are also
-     * converted to strings so `handle()` never throws.
+     * Convert any failure into a readable string so `handle()` never throws
+     * and aborts the agent run.
      *
      * @param callable(): string $callback
      */
@@ -76,8 +74,7 @@ abstract class FirecrawlTool implements Tool
     }
 
     /**
-     * Trim tool output so a large page cannot overflow the model context
-     * or the consumer's conversation storage.
+     * Trim tool output so large pages do not overflow the model context.
      */
     protected function truncate(string $content, int $maxCharacters): string
     {

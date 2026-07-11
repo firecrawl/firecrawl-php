@@ -11,8 +11,7 @@ final class FirecrawlTools
     private function __construct() {}
 
     /**
-     * All core Firecrawl tools, ready to spread into an agent's tools() array:
-     * `return [...FirecrawlTools::all()];`
+     * All core Firecrawl tools, ready to spread into an agent's tools() array.
      *
      * @return list<FirecrawlTool>
      */
