@@ -39,7 +39,8 @@ it('crawls a site and returns status and pages as JSON', function (): void {
     expect($body['limit'])->toBe(5);
     expect($body['scrapeOptions']['formats'])->toBe(['markdown']);
     expect($body['integration'])->toBe('_laravel-ai');
-    expect($history[0]['request']->getHeaderLine('x-idempotency-key'))->toMatch('/^[0-9a-f]{32}$/');
+    expect($history[0]['request']->getHeaderLine('x-idempotency-key'))
+        ->toMatch('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/');
 });
 
 it('clamps the page limit between 1 and 25', function (): void {
@@ -73,7 +74,7 @@ it('reuses the same idempotency key across HTTP retries of the start request', f
     $retryKey = $history[1]['request']->getHeaderLine('x-idempotency-key');
     expect($history[0]['request']->getMethod())->toBe('POST');
     expect($history[1]['request']->getMethod())->toBe('POST');
-    expect($firstKey)->toMatch('/^[0-9a-f]{32}$/');
+    expect($firstKey)->toMatch('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/');
     expect($retryKey)->toBe($firstKey);
 });
 
