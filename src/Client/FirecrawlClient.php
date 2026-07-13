@@ -746,6 +746,11 @@ final class FirecrawlClient
      * with a `success: false` body; the flag, not the status code, is the
      * error signal for those.
      *
+     * Only the synchronous endpoints (scrape, search, map) run this check.
+     * Async crawl responses skip it deliberately: a failed start yields a
+     * null job ID that callers guard (pollCrawl() throws on it), and status
+     * polling exposes `status` explicitly on CrawlJob.
+     *
      * @param array<string, mixed> $response
      * @return array<string, mixed> the same response, if it does not signal failure
      */
